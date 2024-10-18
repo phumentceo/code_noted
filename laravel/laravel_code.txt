@@ -1,0 +1,118 @@
+
+1.Laravel with Factory 
+
+  public function definition(): array  { 
+ 
+    // Fetch color IDs from the database  
+    $colorIds = Color::pluck('id')->toArray(); 
+  
+    // Randomly select up to 4 colors (adjust to the count if less than 4)  
+    $numberOfColorsToSelect = rand(1, min(4, count($colorIds)));   
+
+    $colors = collect($colorIds)->random($numberOfColorsToSelect);   
+    $colorString = implode(',', $colors); // Convert selected colors to a comma-separated string  
+
+    // Fetch category IDs from the database  
+    $categoryIds = Category::pluck('id')->toArray();   
+    $categoryId = collect($categoryIds)->random(); // Randomly select a category ID  
+
+    // Fetch brand IDs from the database  
+    $brandIds = Brand::pluck('id')->toArray();   
+    $brandId = collect($brandIds)->random(); // Randomly select a brand ID  
+
+    // Get current date in d-m-y format  
+    $currentDate = Carbon::now()->format('d-m-y');  
+
+    return [  
+        "title" => $this->faker->text(20),  
+        "price" => $this->faker->numberBetween(200, 1500),  
+        "qty"   => $this->faker->numberBetween(5, 15),  
+        "description" => $this->faker->paragraph(100),  
+        "category_id" => $categoryId, // Correctly assign the category ID  
+        "brand_id" => $brandId, // Correctly assign the brand ID  
+        "color" => $colorString, // Assign color string to this field  
+        "user_id" => 1,  
+        "created_at" => $currentDate, // Use current date in d-m-y format  
+        "updated_at" => $currentDate, // Use current date in d-m-y format  
+    ];  
+}  
+
+2.create a comparison of total sales for the current month
+
+public function compareSales()  
+{  
+    // Get the current date and the previous month  
+    $currentMonthStart = Carbon::now()->startOfMonth();  
+    $currentMonthEnd = Carbon::now()->endOfMonth();  
+
+    $previousMonthStart = Carbon::now()->subMonth()->startOfMonth();  
+    $previousMonthEnd = Carbon::now()->subMonth()->endOfMonth();  
+
+    // Get total sales for the current month  
+    $currentMonthSales = Sale::whereBetween('created_at', [$currentMonthStart, $currentMonthEnd])  
+        ->sum('amount');  // Assuming 'amount' is the field that represents the sale total  
+
+    // Get total sales for the previous month  
+    $previousMonthSales = Sale::whereBetween('created_at', [$previousMonthStart, $previousMonthEnd])  
+        ->sum('amount');  
+
+    return [  
+        'current_month_sales' => $currentMonthSales,  
+        'previous_month_sales' => $previousMonthSales,  
+        'difference' => $currentMonthSales - $previousMonthSales,  
+        'current_month' => $currentMonthStart->format('F Y'), // Formatted current month  
+        'previous_month' => $previousMonthStart->format('F Y') // Formatted previous month  
+    ];  
+}
+
+
+3.the last 1 of year
+
+public function compareSalesLastYear()  
+{  
+    // Get the current month and year  
+    $currentYear = Carbon::now()->year;  
+    $currentMonth = Carbon::now()->month;  
+
+    // Initialize an array to store sales data for the last 12 months  
+    $salesData = [];  
+
+    // Loop to get sales data for the last 12 months  
+    for ($i = 0; $i < 12; $i++) {  
+        // Calculate the month for the loop period (current month minus the loop index)  
+        $month = Carbon::now()->subMonths($i);  
+        
+        // Get the start and end of the month  
+        $monthStart = $month->startOfMonth();  
+        $monthEnd = $month->endOfMonth();  
+
+        // Get total sales for that month  
+        $totalSales = Sale::whereBetween('created_at', [$monthStart, $monthEnd])  
+            ->sum('amount');  // Assuming 'amount' is the field representing the total sale amount  
+        
+        // Store the sales amount with the formatted month name  
+        $salesData[$month->format('F Y')] = $totalSales;  
+    }  
+
+    return $salesData; // This will return an array of sales data for the last 12 months  
+}
+
+
+
+4.with minutes time 
+public function getSalesLast8Minutes()  
+{  
+    // Get the current time and subtract 8 minutes  
+    $startTime = Carbon::now()->subMinutes(8);  
+    $endTime = Carbon::now(); // Current time  
+
+    // Query total sales within the last 8 minutes  
+    $totalSales = Sale::whereBetween('created_at', [$startTime, $endTime])  
+        ->sum('amount');  // Assuming 'amount' is the field representing total sales amount  
+
+    return [  
+        'total_sales' => $totalSales,  
+        'start_time' => $startTime->toDateTimeString(), // Optional: return the start time  
+        'end_time' => $endTime->toDateTimeString(), // Optional: return the end time  
+    ];  
+}
