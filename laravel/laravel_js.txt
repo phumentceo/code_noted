@@ -1,0 +1,37 @@
+1.Javascript with deleted
+--------------------------------------------------------------------
+
+    //Event for seleted
+    const handleSelect = () => {
+        let selectedProducts = [];
+        $('input[type="checkbox"]:checked').each(function() {
+        selectedProducts.push($(this).val());
+        });
+
+        if(selectedProducts.length >1){
+
+            //convert array to string
+            let ids = selectedProducts.join(',');
+            $('#delete-product').removeClass('d-none');
+
+            //set to delete button
+            $('#delete-product').text('Delete Selected (' + selectedProducts.length + ')');
+
+            //push to delete button
+            $('#delete-product').attr('product-id',ids);
+
+        }else{
+            $('#delete-product').addClass('d-none');
+        }
+
+        console.log(selectedProducts); 
+    }
+    
+    //Event for deleted
+    const SelectedWithDelete = () => {
+      if(confirm("Do you want to delete with selected ?")){
+        let ids = $('#delete-product').attr('product-id');
+      }
+    } 
+
+----------------------------------------------------------------------
