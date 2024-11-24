@@ -1,41 +1,47 @@
 --------------------------------------------------------------------------
 1.Laravel with Factory 
 
-  public function definition(): array  { 
- 
-    // Fetch color IDs from the database  
-    $colorIds = Color::pluck('id')->toArray(); 
   
-    // Randomly select up to 4 colors (adjust to the count if less than 4)  
-    $numberOfColorsToSelect = rand(1, min(4, count($colorIds)));   
 
-    $colors = collect($colorIds)->random($numberOfColorsToSelect);   
-    $colorString = implode(',', $colors); // Convert selected colors to a comma-separated string  
+    public function definition(): array  
+    {   
+        
+        $colorIds = Color::pluck('id')->toArray();   
+        
+       
+        $numberOfColorsToSelect = rand(1, min(4, count($colorIds)));  
+        
+        // Select random color IDs and convert to array  
+        $colors = collect($colorIds)->random($numberOfColorsToSelect)->all();
+        $colorString = implode(',', $colors);  
+    
+        // Fetch category IDs from the database  
+        $categoryIds = Category::pluck('id')->toArray();   
+        $categoryId = collect($categoryIds)->random();  
 
-    // Fetch category IDs from the database  
-    $categoryIds = Category::pluck('id')->toArray();   
-    $categoryId = collect($categoryIds)->random(); // Randomly select a category ID  
+    
+        // Fetch brand IDs from the database  
+        $brandIds = Brand::pluck('id')->toArray();   
+        $brandId = collect($brandIds)->random(); 
+    
+        // Get current date in d-m-y format  
+        $currentDate = Carbon::now()->format('d-m-y');  
+    
+        return [  
+            "name" => $this->faker->text(20),  
+            "price" => $this->faker->numberBetween(200, 1500),  
+            "qty"   => $this->faker->numberBetween(5, 15),  
+            "desc" => $this->faker->paragraph(100),  
+            "category_id" => $categoryId,   
+            "brand_id" => $brandId, 
+            "color" => $colorString,  
+            "user_id" => 1,  
+            "created_at" => $currentDate, 
+            "updated_at" => $currentDate, 
+        ];
+          
+    }  
 
-    // Fetch brand IDs from the database  
-    $brandIds = Brand::pluck('id')->toArray();   
-    $brandId = collect($brandIds)->random(); // Randomly select a brand ID  
-
-    // Get current date in d-m-y format  
-    $currentDate = Carbon::now()->format('d-m-y');  
-
-    return [  
-        "title" => $this->faker->text(20),  
-        "price" => $this->faker->numberBetween(200, 1500),  
-        "qty"   => $this->faker->numberBetween(5, 15),  
-        "description" => $this->faker->paragraph(100),  
-        "category_id" => $categoryId, // Correctly assign the category ID  
-        "brand_id" => $brandId, // Correctly assign the brand ID  
-        "color" => $colorString, // Assign color string to this field  
-        "user_id" => 1,  
-        "created_at" => $currentDate, // Use current date in d-m-y format  
-        "updated_at" => $currentDate, // Use current date in d-m-y format  
-    ];  
-}  
 
 --------------------------------------------------------------------------
 
